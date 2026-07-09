@@ -1,0 +1,4 @@
+name = "csabaza"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-07-09"
+compatibility_flags = ["nodejs_compat"]
