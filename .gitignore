@@ -20,7 +20,6 @@ dist-ssr
 
 # Environment / secrets
 *.local
-.env
 
 # Lockfiles (use npm — package-lock.json)
 bun.lock
