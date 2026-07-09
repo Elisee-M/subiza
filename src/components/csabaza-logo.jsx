@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import logoAsset from "@/assets/csabaza-logo.png.asset.json";
+import logoSrc from "@/assets/logo.png";
 
 export function CSAbazaLogo({ className = "", showTagline = true }) {
   return (
     <Link to="/" className={`inline-flex items-center gap-3 ${className}`}>
       <img
-        src={logoAsset.url}
+        src={logoSrc}
         alt="CSAbaza"
         className="h-12 w-auto sm:h-14"
         loading="eager"
