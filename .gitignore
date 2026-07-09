@@ -41,10 +41,9 @@ bunfig.toml
 *.sln
 *.sw?
 
-# Firebase
+# Firebase (no longer used)
 .firebase/
-functions/node_modules/
-y/
+functions/
 
 # Lovable / agent scaffolding
 .agents/
