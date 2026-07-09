@@ -9,9 +9,9 @@ import { ArrowRight, Brain, Gamepad2, LineChart, Sparkles, Trophy, Users, Zap } 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "CSAbaza — Live quizzes that actually engage" },
+      { title: "Subiza — Live quizzes that actually engage" },
       { name: "description", content: "Create AI-powered quizzes, host live games with a PIN, and watch your classroom light up. Built for schools." },
-      { property: "og:title", content: "CSAbaza — Live quizzes that actually engage" },
+      { property: "og:title", content: "Subiza — Live quizzes that actually engage" },
       { property: "og:description", content: "Create AI-powered quizzes, host live games with a PIN, and watch your classroom light up." },
     ],
   }),
@@ -141,7 +141,7 @@ function LandingPage() {
       </section>
 
       <footer className="border-t py-8 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} CSAbaza. Made for educators.
+        © {new Date().getFullYear()} Subiza. Made for educators.
       </footer>
     </div>
   );

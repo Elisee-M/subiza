@@ -18,7 +18,7 @@ import {
 } from "@/lib/superadmin.functions";
 
 export const Route = createFileRoute("/_authenticated/superadmin")({
-  head: () => ({ meta: [{ title: "Superadmin — CSAbaza" }] }),
+  head: () => ({ meta: [{ title: "Superadmin — Subiza" }] }),
   component: SuperadminPage,
 });
 

@@ -26,7 +26,7 @@ function JoinPage() {
     let cancelled = false;
     (async () => {
       try {
-        const stored = localStorage.getItem(`csabaza:pin:${pin}`);
+        const stored = localStorage.getItem(`subiza:pin:${pin}`);
         if (stored) {
           navigate({ to: "/play/$pin", params: { pin }, replace: true });
           return;
@@ -52,8 +52,8 @@ function JoinPage() {
     try {
       const res = await join({ data: { pin, nickname: nickname.trim() } });
       const payload = JSON.stringify(res);
-      localStorage.setItem(`csabaza:${res.sessionId}`, payload);
-      localStorage.setItem(`csabaza:pin:${pin}`, payload);
+      localStorage.setItem(`subiza:${res.sessionId}`, payload);
+      localStorage.setItem(`subiza:pin:${pin}`, payload);
       navigate({ to: "/play/$pin", params: { pin }, replace: true });
     } catch (err) {
       toast.error(err?.message ?? "Could not join");

@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { submitAnswer, getPlayBootstrap } from "@/lib/student.functions";
 import { Check, X, Trophy, Clock } from "lucide-react";
-import { QUESTION_COLORS } from "@/lib/csabaza";
+import { QUESTION_COLORS } from "@/lib/subiza";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
 import { WinnersPodium, fireCelebration } from "@/components/winners-podium";
@@ -31,7 +31,7 @@ function PlayPage() {
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(`csabaza:pin:${pin}`);
+      const stored = localStorage.getItem(`subiza:pin:${pin}`);
       if (stored) setParticipant(JSON.parse(stored));
     } catch {}
   }, [pin]);
@@ -44,8 +44,8 @@ function PlayPage() {
         if (cancelled) return;
         setSession(res.session);
         const stored =
-          localStorage.getItem(`csabaza:pin:${pin}`) ||
-          localStorage.getItem(`csabaza:${res.session.id}`);
+          localStorage.getItem(`subiza:pin:${pin}`) ||
+          localStorage.getItem(`subiza:${res.session.id}`);
         if (stored) setParticipant(JSON.parse(stored));
         setQuestions(res.questions ?? []);
         setParticipants(res.participants ?? []);

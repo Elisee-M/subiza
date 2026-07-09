@@ -11,7 +11,7 @@ import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Sign in — CSAbaza" }] }),
+  head: () => ({ meta: [{ title: "Sign in — Subiza" }] }),
   component: AuthPage,
 });
 

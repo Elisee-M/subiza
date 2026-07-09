@@ -8,7 +8,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { advanceSession } from "@/lib/session.functions";
 import { Play, SkipForward, Eye, StopCircle, Clock, Users, Copy } from "lucide-react";
 import { toast } from "sonner";
-import { QUESTION_COLORS } from "@/lib/csabaza";
+import { QUESTION_COLORS } from "@/lib/subiza";
 
 export const Route = createFileRoute("/_authenticated/host/$sessionId")({
   component: HostPage,

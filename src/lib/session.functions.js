@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import { generatePin } from "./csabaza";
+import { generatePin } from "./subiza";
 
 export const createSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

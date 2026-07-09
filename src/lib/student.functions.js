@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { calcScore } from "./csabaza";
+import { calcScore } from "./subiza";
 
 export const joinSession = createServerFn({ method: "POST" })
   .inputValidator((d) =>

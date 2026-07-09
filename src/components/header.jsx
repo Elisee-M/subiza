@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { CSAbazaLogo } from "./csabaza-logo";
+import { SubizaLogo } from "./subiza-logo";
 import { Button } from "./ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { LogOut, LayoutDashboard, Shield, Home, LogIn, Gamepad2, ShieldAlert } from "lucide-react";
@@ -9,7 +9,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full glass">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <CSAbazaLogo />
+        <SubizaLogo />
         <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
           <Button variant="ghost" size="sm" asChild>
             <Link
