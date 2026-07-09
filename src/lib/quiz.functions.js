@@ -25,7 +25,7 @@ const SaveQuizInput = z.object({
 
 export const saveQuiz = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => SaveQuizInput.parse(d))
+  .inputValidator((d) => SaveQuizInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     let quizId = data.id;
@@ -58,7 +58,7 @@ export const saveQuiz = createServerFn({ method: "POST" })
     }
 
     const rows = data.questions.map((q, i) => ({
-      quiz_id: quizId!,
+      quiz_id: quizId,
       type: q.type,
       question_text: q.question_text,
       image_url: q.image_url ?? null,
@@ -78,7 +78,7 @@ export const saveQuiz = createServerFn({ method: "POST" })
 
 export const deleteQuiz = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string() }).parse(d))
+  .inputValidator((d) => z.object({ id: z.string() }).parse(d))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("quizzes").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
