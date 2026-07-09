@@ -5,6 +5,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as FoundersRouteImport } from './routes/founders'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -18,6 +19,11 @@ import { Route as AuthenticatedQuizzesNewRouteImport } from './routes/_authentic
 import { Route as AuthenticatedHostSessionIdRouteImport } from './routes/_authenticated/host.$sessionId'
 import { Route as AuthenticatedQuizzesIdEditRouteImport } from './routes/_authenticated/quizzes.$id.edit'
 
+const FoundersRoute = FoundersRouteImport.update({
+  id: '/founders',
+  path: '/founders',
+  getParentRoute: () => rootRouteImport,
+})
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -98,6 +104,7 @@ const rootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  FoundersRoute: FoundersRoute,
   JoinPinRoute: JoinPinRoute,
   PlayPinRoute: PlayPinRoute,
 }
