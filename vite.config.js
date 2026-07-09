@@ -12,8 +12,8 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
-  // Firebase preset: build as Node.js middleware for Cloud Functions
+  // Cloudflare Pages preset
   nitro: {
-    preset: "node-middleware",
+    preset: "cloudflare-pages",
   },
 });
