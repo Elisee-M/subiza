@@ -17,39 +17,18 @@ export const Route = createFileRoute("/play/$pin")({
   component: PlayPage,
 });
 
-type SessionRow = {
-  id: string;
-  quiz_id: string;
-  status: "lobby" | "active" | "question" | "reveal" | "ended";
-  current_question_index: number;
-  current_question_started_at: string | null;
-};
-
-type QuestionRow = {
-  id: string;
-  question_text: string;
-  type: string;
-  options: string[];
-  timer_seconds: number;
-  image_url: string | null;
-  points?: number;
-};
-
-type RevealInfo = { selected: string; correct: boolean; points: number; correctAnswer: string | null; explanation: string | null };
-
 function PlayPage() {
   const { pin } = Route.useParams();
-  const [session, setSession] = useState<SessionRow | null>(null);
-  const [questions, setQuestions] = useState<QuestionRow[]>([]);
-  const [participants, setParticipants] = useState<{ id: string; nickname: string; score: number }[]>([]);
-  const [participant, setParticipant] = useState<{ sessionId: string; participantId: string; nickname: string } | null>(null);
-  const [answered, setAnswered] = useState<Record<string, RevealInfo>>({});
+  const [session, setSession] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [participants, setParticipants] = useState([]);
+  const [participant, setParticipant] = useState(null);
+  const [answered, setAnswered] = useState({});
   const [now, setNow] = useState(Date.now());
 
   const submit = useServerFn(submitAnswer);
   const bootstrap = useServerFn(getPlayBootstrap);
 
-  // Load participant from localStorage immediately (keyed by pin)
   useEffect(() => {
     try {
       const stored = localStorage.getItem(`csabaza:pin:${pin}`);
@@ -57,21 +36,20 @@ function PlayPage() {
     } catch {}
   }, [pin]);
 
-  // Load session
   useEffect(() => {
     let cancelled = false;
     async function load() {
       try {
         const res = await bootstrap({ data: { pin } });
         if (cancelled) return;
-        setSession(res.session as any);
+        setSession(res.session);
         const stored =
           localStorage.getItem(`csabaza:pin:${pin}`) ||
           localStorage.getItem(`csabaza:${res.session.id}`);
         if (stored) setParticipant(JSON.parse(stored));
-        setQuestions((res.questions as any) ?? []);
-        setParticipants((res.participants as any) ?? []);
-      } catch (err: any) {
+        setQuestions(res.questions ?? []);
+        setParticipants(res.participants ?? []);
+      } catch (err) {
         toast.error(err?.message ?? "Could not load game");
       }
     }
@@ -79,23 +57,21 @@ function PlayPage() {
     return () => { cancelled = true; };
   }, [pin]);
 
-  // Realtime subscriptions
   useEffect(() => {
     if (!session) return;
     const ch = supabase
       .channel(`play-${session.id}`)
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "sessions", filter: `id=eq.${session.id}` },
-        (payload) => setSession(payload.new as any))
+        (payload) => setSession(payload.new))
       .on("postgres_changes", { event: "*", schema: "public", table: "participants", filter: `session_id=eq.${session.id}` },
         async () => {
           const { data } = await supabase.from("participants").select("*").eq("session_id", session.id);
-          setParticipants((data as any) ?? []);
+          setParticipants(data ?? []);
         })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, [session?.id]);
 
-  // Timer tick
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 200);
     return () => clearInterval(t);
@@ -112,22 +88,19 @@ function PlayPage() {
     return me ? sorted.findIndex((p) => p.id === me.id) + 1 : 0;
   }, [participants, me]);
 
-  // Celebrate when the game ends
   useEffect(() => {
     if (session?.status === "ended" && participants.length > 0) {
       fireCelebration(confetti);
     }
   }, [session?.status, participants.length]);
 
-  async function pickAnswer(opt: string) {
+  async function pickAnswer(opt) {
     if (!participant || !currentQ || answered[currentQ.id]) return;
-    // Optimistic lock so the user can only click once
     setAnswered((a) => ({ ...a, [currentQ.id]: { selected: opt, correct: false, points: 0, correctAnswer: null, explanation: null } }));
     try {
       const res = await submit({ data: { participantId: participant.participantId, questionId: currentQ.id, selectedAnswer: opt } });
       setAnswered((a) => ({ ...a, [currentQ.id]: { selected: opt, correct: res.isCorrect, points: res.points, correctAnswer: res.correctAnswer ?? null, explanation: res.explanation ?? null } }));
-    } catch (err: any) {
-      // Revert lock so the user can retry
+    } catch (err) {
       setAnswered((a) => { const n = { ...a }; delete n[currentQ.id]; return n; });
       toast.error(err?.message ?? "Could not submit");
     }
@@ -245,7 +218,7 @@ function PlayPage() {
   );
 }
 
-function Lobby({ participants }: { participants: { id: string; nickname: string }[] }) {
+function Lobby({ participants }) {
   return (
     <Card className="p-10 text-center bg-gradient-card border-2">
       <div className="mx-auto size-20 rounded-full bg-gradient-primary animate-pulse-ring grid place-items-center text-primary-foreground">
@@ -262,9 +235,9 @@ function Lobby({ participants }: { participants: { id: string; nickname: string 
   );
 }
 
-function Leaderboard({ participants, highlight, maxScore }: { participants: { id: string; nickname: string; score: number }[]; highlight: string; maxScore?: number }) {
+function Leaderboard({ participants, highlight, maxScore }) {
   const sorted = [...participants].sort((a, b) => b.score - a.score).slice(0, 10);
-  const fmt = (s: number) => (maxScore && maxScore > 0 ? `${Math.round((s / maxScore) * 100)}/100` : `${s}`);
+  const fmt = (s) => (maxScore && maxScore > 0 ? `${Math.round((s / maxScore) * 100)}/100` : `${s}`);
   return (
     <div className="max-w-md mx-auto text-left">
       <h3 className="font-semibold mb-2">Top scores</h3>
@@ -279,7 +252,7 @@ function Leaderboard({ participants, highlight, maxScore }: { participants: { id
   );
 }
 
-function Loading({ text }: { text: string }) {
+function Loading({ text }) {
   return (
     <div className="min-h-screen grid place-items-center bg-hero">
       <p className="text-muted-foreground">{text}</p>
@@ -287,7 +260,7 @@ function Loading({ text }: { text: string }) {
   );
 }
 
-function FillBlankInput({ locked, onSubmit }: { locked: boolean; onSubmit: (v: string) => void }) {
+function FillBlankInput({ locked, onSubmit }) {
   const [val, setVal] = useState("");
   return (
     <div className="flex gap-2">
@@ -311,7 +284,7 @@ function FillBlankInput({ locked, onSubmit }: { locked: boolean; onSubmit: (v: s
   );
 }
 
-function MatchingInput({ pairs, locked, onSubmit }: { pairs: string[]; locked: boolean; onSubmit: (v: string) => void }) {
+function MatchingInput({ pairs, locked, onSubmit }) {
   const parsed = useMemo(
     () => pairs.map((p) => {
       const [l = "", r = ""] = p.split("|");
@@ -321,10 +294,9 @@ function MatchingInput({ pairs, locked, onSubmit }: { pairs: string[]; locked: b
   );
   const rightOptions = useMemo(() => {
     const arr = parsed.map((p) => p.r);
-    // shuffle deterministically-ish
     return [...arr].sort(() => Math.random() - 0.5);
   }, [parsed.length]);
-  const [picks, setPicks] = useState<Record<string, string>>({});
+  const [picks, setPicks] = useState({});
   const allChosen = parsed.every((p) => picks[p.l]);
 
   function submit() {
