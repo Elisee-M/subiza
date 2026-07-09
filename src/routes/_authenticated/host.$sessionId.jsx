@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -16,10 +16,10 @@ export const Route = createFileRoute("/_authenticated/host/$sessionId")({
 
 function HostPage() {
   const { sessionId } = Route.useParams();
-  const [session, setSession] = useState<any>(null);
-  const [questions, setQuestions] = useState<any[]>([]);
-  const [participants, setParticipants] = useState<any[]>([]);
-  const [responses, setResponses] = useState<any[]>([]);
+  const [session, setSession] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [participants, setParticipants] = useState([]);
+  const [responses, setResponses] = useState([]);
   const [now, setNow] = useState(Date.now());
   const advance = useServerFn(advanceSession);
   const navigate = useNavigate();
@@ -50,7 +50,6 @@ function HostPage() {
           setResponses(data ?? []);
         })
       .subscribe();
-    // initial loads
     supabase.from("participants").select("*").eq("session_id", sessionId).then(({ data }) => setParticipants(data ?? []));
     supabase.from("responses").select("*").eq("session_id", sessionId).then(({ data }) => setResponses(data ?? []));
     return () => { supabase.removeChannel(ch); };
@@ -68,16 +67,15 @@ function HostPage() {
   const qResponses = currentQ ? responses.filter((r) => r.question_id === currentQ.id) : [];
   const sortedLeaders = [...participants].sort((a, b) => b.score - a.score);
 
-  async function act(action: "start" | "reveal" | "next" | "end") {
+  async function act(action) {
     try {
       await advance({ data: { sessionId, action } });
       if (action === "end") navigate({ to: "/results/$sessionId", params: { sessionId } });
-    } catch (e: any) { toast.error(e?.message ?? "Action failed"); }
+    } catch (e) { toast.error(e?.message ?? "Action failed"); }
   }
 
-  // Auto-advance: only when session.auto_advance is enabled
-  const autoActionRef = useRef<string | null>(null);
-  const revealAtRef = useRef<number | null>(null);
+  const autoActionRef = useRef(null);
+  const revealAtRef = useRef(null);
   const REVEAL_MS = 4000;
   useEffect(() => {
     if (!session || !currentQ) return;
@@ -98,16 +96,13 @@ function HostPage() {
     }
   }, [session?.status, session?.current_question_index, session?.auto_advance, remaining, currentQ?.id]);
 
-  async function toggleAutoAdvance(next: boolean) {
+  async function toggleAutoAdvance(next) {
     const { error } = await supabase.from("sessions").update({ auto_advance: next }).eq("id", sessionId);
     if (error) toast.error(error.message);
-    else setSession((s: any) => ({ ...s, auto_advance: next }));
+    else setSession((s) => ({ ...s, auto_advance: next }));
   }
 
   if (!session) return <div className="min-h-screen grid place-items-center bg-hero"><p>Loading...</p></div>;
-
-
-
 
   return (
     <div className="min-h-screen bg-background">
@@ -161,7 +156,7 @@ function HostPage() {
               {currentQ.image_url && <img src={currentQ.image_url} alt="" className="mt-4 rounded-lg max-h-64 mx-auto" />}
             </Card>
             <div className="grid sm:grid-cols-2 gap-3">
-              {(currentQ.options as string[]).map((opt, i) => {
+              {currentQ.options.map((opt, i) => {
                 const isCorrect = session.status === "reveal" && currentQ.correct_answer === opt;
                 const count = qResponses.filter((r) => r.selected_answer === opt).length;
                 return (
@@ -206,7 +201,6 @@ function HostPage() {
           </Card>
         )}
 
-        {/* Live leaderboard */}
         <Card className="p-5">
           <h3 className="font-bold mb-3 flex items-center gap-2"><Users className="size-4" /> Players ({participants.length})</h3>
           {participants.length === 0 ? (
