@@ -12,20 +12,7 @@ import { saveQuiz } from "@/lib/quiz.functions";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 
-export type QuestionDraft = {
-  id?: string;
-  type: "multiple_choice" | "true_false" | "fill_blank" | "poll" | "matching";
-  question_text: string;
-  options: string[];
-  correct_answer: string;
-  explanation?: string;
-  timer_seconds: number;
-  points: number;
-  image_url?: string | null;
-  difficulty?: string;
-};
-
-const AI_TYPES: { value: "multiple_choice" | "true_false" | "fill_blank" | "matching"; label: string }[] = [
+const AI_TYPES = [
   { value: "multiple_choice", label: "Multiple choice" },
   { value: "true_false", label: "True / False" },
   { value: "fill_blank", label: "Fill in the blank" },
@@ -35,24 +22,21 @@ const AI_TYPES: { value: "multiple_choice" | "true_false" | "fill_blank" | "matc
 export function QuizEditor({
   initial,
   initialAI,
-}: {
-  initial?: { id?: string; title: string; description: string; visibility: "public" | "private"; questions: QuestionDraft[] };
-  initialAI?: boolean;
 }) {
   const navigate = useNavigate();
   const [title, setTitle] = useState(initial?.title ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
-  const [visibility, setVisibility] = useState<"public" | "private">(initial?.visibility ?? "private");
-  const [questions, setQuestions] = useState<QuestionDraft[]>(initial?.questions ?? []);
+  const [visibility, setVisibility] = useState(initial?.visibility ?? "private");
+  const [questions, setQuestions] = useState(initial?.questions ?? []);
   const [aiOpen, setAiOpen] = useState(!!initialAI && !initial);
   const [aiTopic, setAiTopic] = useState("");
   const [aiCount, setAiCount] = useState(8);
   const [aiNotes, setAiNotes] = useState("");
-  const [aiNotesFileName, setAiNotesFileName] = useState<string | null>(null);
+  const [aiNotesFileName, setAiNotesFileName] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const [aiTypes, setAiTypes] = useState<Record<string, boolean>>({
+  const [aiTypes, setAiTypes] = useState({
     multiple_choice: true,
     true_false: true,
     fill_blank: false,
@@ -62,7 +46,7 @@ export function QuizEditor({
   const aiGen = useServerFn(generateAIQuiz);
   const save = useServerFn(saveQuiz);
 
-  function addQuestion(type: QuestionDraft["type"] = "multiple_choice") {
+  function addQuestion(type = "multiple_choice") {
     setQuestions((qs) => [
       ...qs,
       {
@@ -93,38 +77,37 @@ export function QuizEditor({
       const res = await aiGen({ data: { topic: aiTopic.trim() || "From uploaded notes", count: aiCount, difficulty: "mixed", notes: aiNotes ? aiNotes.slice(0, 60000) : undefined, types: selectedTypes } });
       if (!title) setTitle(res.title);
       if (!description) setDescription(res.description);
-      setQuestions((qs) => [...qs, ...(res.questions as QuestionDraft[])]);
+      setQuestions((qs) => [...qs, ...res.questions]);
       setAiOpen(false);
       toast.success(`Generated ${res.questions.length} questions`);
-    } catch (e: any) {
+    } catch (e) {
       toast.error(e?.message ?? "AI generation failed");
     } finally {
       setAiLoading(false);
     }
   }
 
-  async function handleNotesFile(file: File | null) {
+  async function handleNotesFile(file) {
     if (!file) return;
     if (file.size > 15_000_000) return toast.error("File too large (max 15MB)");
     const name = file.name.toLowerCase();
     try {
       let text = "";
       if (name.endsWith(".pdf")) {
-        const pdfjs: any = await import("pdfjs-dist");
-        // Use a bundled worker to avoid CDN/CORS issues
+        const pdfjs = await import("pdfjs-dist");
         const workerSrc = (await import("pdfjs-dist/build/pdf.worker.min.mjs?url")).default;
         pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
         const buf = await file.arrayBuffer();
         const pdf = await pdfjs.getDocument({ data: buf }).promise;
-        const parts: string[] = [];
+        const parts = [];
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const content = await page.getTextContent();
-          parts.push(content.items.map((it: any) => it.str).join(" "));
+          parts.push(content.items.map((it) => it.str).join(" "));
         }
         text = parts.join("\n\n");
       } else if (name.endsWith(".docx")) {
-        const mammoth: any = await import(/* @vite-ignore */ "mammoth/mammoth.browser" as any);
+        const mammoth = await import("mammoth/mammoth.browser");
         const buf = await file.arrayBuffer();
         const res = await mammoth.extractRawText({ arrayBuffer: buf });
         text = res.value;
@@ -137,7 +120,7 @@ export function QuizEditor({
       setAiNotes((prev) => (prev ? prev + "\n\n" : "") + text);
       setAiNotesFileName(file.name);
       toast.success(`Loaded ${file.name}`);
-    } catch (e: any) {
+    } catch (e) {
       toast.error(`Failed to read file: ${e?.message ?? "unknown error"}`);
     }
   }
@@ -162,7 +145,7 @@ export function QuizEditor({
       const res = await save({ data: { id: initial?.id, title, description, visibility, questions } });
       toast.success("Saved!");
       navigate({ to: "/quizzes/$id/edit", params: { id: res.id } });
-    } catch (e: any) {
+    } catch (e) {
       toast.error(e?.message ?? "Save failed");
     } finally {
       setSaving(false);
@@ -183,7 +166,7 @@ export function QuizEditor({
           </div>
           <div>
             <Label>Visibility</Label>
-            <Select value={visibility} onValueChange={(v: any) => setVisibility(v)}>
+            <Select value={visibility} onValueChange={(v) => setVisibility(v)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="private">Private</SelectItem>
@@ -298,8 +281,8 @@ export function QuizEditor({
   );
 }
 
-function QuestionCard({ q, index, onChange, onRemove }: { q: QuestionDraft; index: number; onChange: (q: QuestionDraft) => void; onRemove: () => void }) {
-  function setOpt(i: number, v: string) {
+function QuestionCard({ q, index, onChange, onRemove }) {
+  function setOpt(i, v) {
     const opts = [...q.options];
     opts[i] = v;
     onChange({ ...q, options: opts });
@@ -330,7 +313,7 @@ function QuestionCard({ q, index, onChange, onRemove }: { q: QuestionDraft; inde
           <Label>Pairs (left ↔ right)</Label>
           {q.options.map((pair, i) => {
             const [left = "", right = ""] = pair.split("|");
-            const setPair = (l: string, r: string) => setOpt(i, `${l}|${r}`);
+            const setPair = (l, r) => setOpt(i, `${l}|${r}`);
             return (
               <div key={i} className="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-2">
                 <Input value={left} placeholder={`Left ${i + 1}`} onChange={(e) => setPair(e.target.value, right)} />
