@@ -12,7 +12,7 @@ import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import logoAsset from "@/assets/csabaza-logo.png.asset.json";
+import logoSrc from "@/assets/logo.png";
 import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
@@ -83,15 +83,15 @@ export const Route = createRootRouteWithContext()({
       { title: "CSAbaza | Live Quiz Platform" },
       { name: "description", content: "CSAbaza is a real-time quiz platform for schools where teachers host live games and students join with a PIN." },
       { name: "author", content: "CSAbaza" },
-      { name: "google-site-verification", content: "Z28Yl9Hjn8hnXUun4sDfqnN5M7isKLVVKu07Bt_jglM" },
+      { name: "google-site-verification", content: "-v7hv6CqHCVSTT1V7mj0C4CbNZPk0imtagdkhJwZzKU" },
       { property: "og:title", content: "CSAbaza | Live Quiz Platform" },
       { property: "og:description", content: "CSAbaza is a real-time quiz platform for schools where teachers host live games and students join with a PIN." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "CSAbaza | Live Quiz Platform" },
       { name: "twitter:description", content: "CSAbaza is a real-time quiz platform for schools where teachers host live games and students join with a PIN." },
-      { property: "og:image", content: logoAsset.url },
-      { name: "twitter:image", content: logoAsset.url },
+      { property: "og:image", content: logoSrc },
+      { name: "twitter:image", content: logoSrc },
     ],
     links: [
       {
@@ -100,7 +100,7 @@ export const Route = createRootRouteWithContext()({
       },
       {
         rel: "icon",
-        href: logoAsset.url,
+        href: logoSrc,
       },
     ],
   }),
