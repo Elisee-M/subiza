@@ -3,7 +3,7 @@ import { z } from "zod";
 import { calcScore } from "./csabaza";
 
 export const joinSession = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) =>
+  .inputValidator((d) =>
     z.object({
       pin: z.string().regex(/^\d{6}$/),
       nickname: z.string().trim().min(1).max(20),
@@ -20,7 +20,6 @@ export const joinSession = createServerFn({ method: "POST" })
     if (session.status === "ended") throw new Error("This game has ended.");
 
     const nickname = data.nickname.trim();
-    // Dedupe: if same nickname already joined this session, reuse it
     const { data: existing } = await supabaseAdmin
       .from("participants")
       .select("id, nickname")
@@ -41,7 +40,7 @@ export const joinSession = createServerFn({ method: "POST" })
   });
 
 export const submitAnswer = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) =>
+  .inputValidator((d) =>
     z.object({
       participantId: z.string(),
       questionId: z.string(),
@@ -75,7 +74,7 @@ export const submitAnswer = createServerFn({ method: "POST" })
     const startedAt = session.current_question_started_at ? new Date(session.current_question_started_at).getTime() : Date.now();
     const elapsed = Date.now() - startedAt;
 
-    function normalizeMatching(s: string) {
+    function normalizeMatching(s) {
       return s
         .split(";")
         .map((p) => p.trim().toLowerCase())
@@ -120,7 +119,7 @@ export const submitAnswer = createServerFn({ method: "POST" })
   });
 
 export const getPlayBootstrap = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => z.object({ pin: z.string().regex(/^\d{6}$/) }).parse(d))
+  .inputValidator((d) => z.object({ pin: z.string().regex(/^\d{6}$/) }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: session, error } = await supabaseAdmin
@@ -130,7 +129,6 @@ export const getPlayBootstrap = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error || !session) throw new Error("Game not found");
 
-    // Safe question payload — never expose correct_answer or explanation to students before reveal
     const { data: questions } = await supabaseAdmin
       .from("questions")
       .select("id, type, question_text, options, image_url, timer_seconds, order_index")
