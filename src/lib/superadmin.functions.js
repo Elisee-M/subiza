@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-async function assertSuperadmin(ctx: { supabase: any; userId: string }) {
+async function assertSuperadmin(ctx) {
   const { data, error } = await ctx.supabase.rpc("has_role", {
     _user_id: ctx.userId,
     _role: "superadmin",
@@ -23,22 +23,21 @@ export const listAllUsers = createServerFn({ method: "GET" })
 
     const { data: roles } = await supabaseAdmin.from("user_roles").select("user_id, role");
 
-    // Quiz + session counts per user
     const { data: quizzes } = await supabaseAdmin.from("quizzes").select("creator_id");
     const { data: sessions } = await supabaseAdmin.from("sessions").select("host_id");
 
-    const roleMap = new Map<string, string[]>();
-    (roles ?? []).forEach((r: any) => {
+    const roleMap = new Map();
+    (roles ?? []).forEach((r) => {
       const arr = roleMap.get(r.user_id) ?? [];
       arr.push(r.role);
       roleMap.set(r.user_id, arr);
     });
-    const quizCount = new Map<string, number>();
-    (quizzes ?? []).forEach((q: any) => quizCount.set(q.creator_id, (quizCount.get(q.creator_id) ?? 0) + 1));
-    const sessionCount = new Map<string, number>();
-    (sessions ?? []).forEach((s: any) => sessionCount.set(s.host_id, (sessionCount.get(s.host_id) ?? 0) + 1));
+    const quizCount = new Map();
+    (quizzes ?? []).forEach((q) => quizCount.set(q.creator_id, (quizCount.get(q.creator_id) ?? 0) + 1));
+    const sessionCount = new Map();
+    (sessions ?? []).forEach((s) => sessionCount.set(s.host_id, (sessionCount.get(s.host_id) ?? 0) + 1));
 
-    return (profiles ?? []).map((p: any) => ({
+    return (profiles ?? []).map((p) => ({
       ...p,
       roles: roleMap.get(p.id) ?? [],
       quizCount: quizCount.get(p.id) ?? 0,
@@ -48,7 +47,7 @@ export const listAllUsers = createServerFn({ method: "GET" })
 
 export const setUserDisabled = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { userId: string; disabled: boolean }) => d)
+  .inputValidator((d) => d)
   .handler(async ({ data, context }) => {
     await assertSuperadmin(context);
     if (data.userId === context.userId) throw new Error("Cannot disable yourself");
@@ -58,7 +57,6 @@ export const setUserDisabled = createServerFn({ method: "POST" })
       .update({ disabled: data.disabled })
       .eq("id", data.userId);
     if (error) throw error;
-    // Also revoke sessions server-side when disabling
     if (data.disabled) {
       await supabaseAdmin.auth.admin.signOut(data.userId).catch(() => {});
     }
@@ -67,7 +65,7 @@ export const setUserDisabled = createServerFn({ method: "POST" })
 
 export const setUserRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { userId: string; role: "teacher" | "admin" | "superadmin"; grant: boolean }) => d)
+  .inputValidator((d) => d)
   .handler(async ({ data, context }) => {
     await assertSuperadmin(context);
     if (data.userId === context.userId && data.role === "superadmin" && !data.grant) {
@@ -92,7 +90,7 @@ export const setUserRole = createServerFn({ method: "POST" })
 
 export const deleteUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { userId: string }) => d)
+  .inputValidator((d) => d)
   .handler(async ({ data, context }) => {
     await assertSuperadmin(context);
     if (data.userId === context.userId) throw new Error("Cannot delete yourself");
