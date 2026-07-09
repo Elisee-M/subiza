@@ -83,6 +83,7 @@ export const Route = createRootRouteWithContext()({
       { title: "CSAbaza | Live Quiz Platform" },
       { name: "description", content: "CSAbaza is a real-time quiz platform for schools where teachers host live games and students join with a PIN." },
       { name: "author", content: "CSAbaza" },
+      { name: "google-site-verification", content: "Z28Yl9Hjn8hnXUun4sDfqnN5M7isKLVVKu07Bt_jglM" },
       { property: "og:title", content: "CSAbaza | Live Quiz Platform" },
       { property: "og:description", content: "CSAbaza is a real-time quiz platform for schools where teachers host live games and students join with a PIN." },
       { property: "og:type", content: "website" },
