@@ -35,7 +35,7 @@ function LandingPage() {
               AI-powered • Real-time • Built for classrooms
             </div>
             <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-balance">
-              Quizzes that <span className="bg-gradient-primary bg-clip-text text-transparent">turn classrooms</span> into game shows.
+              Quizzes that <span className="text-gradient-primary">turn classrooms</span> into game shows.
             </h1>
             <p className="text-lg text-muted-foreground max-w-xl">
               Create quizzes by hand or in seconds with AI. Host live, share a PIN, and watch students compete in real time.

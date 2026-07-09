@@ -182,6 +182,12 @@
 @layer utilities {
   .bg-hero { background: var(--gradient-hero); }
   .bg-gradient-primary { background: var(--gradient-primary); }
+  .text-gradient-primary {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
   .bg-gradient-card { background: var(--gradient-card); }
   .shadow-elegant { box-shadow: var(--shadow-elegant); }
   .shadow-soft { box-shadow: var(--shadow-soft); }
