@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
-import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-export type AppRole = "admin" | "teacher" | "superadmin";
-
 export function useAuth() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [roles, setRoles] = useState<AppRole[]>([]);
+  const [session, setSession] = useState(null);
+  const [user, setUser] = useState(null);
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,9 +29,8 @@ export function useAuth() {
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id)
-      .then(({ data }) => setRoles((data ?? []).map((r) => r.role as AppRole)));
+      .then(({ data }) => setRoles((data ?? []).map((r) => r.role)));
 
-    // Auto sign-out disabled users
     supabase
       .from("profiles")
       .select("disabled")
