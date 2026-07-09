@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/header";
-import { QuizEditor, type QuestionDraft } from "@/components/quiz-editor";
+import { QuizEditor } from "@/components/quiz-editor";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/quizzes/$id/edit")({
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_authenticated/quizzes/$id/edit")({
 
 function EditQuiz() {
   const { id } = Route.useParams();
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -22,11 +22,11 @@ function EditQuiz() {
           title: quiz.title,
           description: quiz.description ?? "",
           visibility: quiz.visibility,
-          questions: (questions ?? []).map((q: any): QuestionDraft => ({
+          questions: (questions ?? []).map((q) => ({
             id: q.id,
             type: q.type,
             question_text: q.question_text,
-            options: (q.options as string[]) ?? [],
+            options: q.options ?? [],
             correct_answer: q.correct_answer ?? "",
             explanation: q.explanation ?? "",
             timer_seconds: q.timer_seconds,
