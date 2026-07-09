@@ -17,12 +17,11 @@ function JoinPage() {
   const [nickname, setNickname] = useState("");
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
-  const [pinError, setPinError] = useState<string | null>(null);
+  const [pinError, setPinError] = useState(null);
   const join = useServerFn(joinSession);
   const bootstrap = useServerFn(getPlayBootstrap);
   const navigate = useNavigate();
 
-  // Verify the PIN exists and the game isn't over before showing the form
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -34,10 +33,10 @@ function JoinPage() {
         }
         const res = await bootstrap({ data: { pin } });
         if (cancelled) return;
-        if ((res.session as any).status === "ended") {
+        if (res.session.status === "ended") {
           setPinError("This game has already ended. Ask your teacher for a new PIN.");
         }
-      } catch (err: any) {
+      } catch (err) {
         if (!cancelled) setPinError(err?.message ?? "Game not found. Check the PIN and try again.");
       } finally {
         if (!cancelled) setChecking(false);
@@ -46,7 +45,7 @@ function JoinPage() {
     return () => { cancelled = true; };
   }, [pin, navigate]);
 
-  async function handleJoin(e: React.FormEvent) {
+  async function handleJoin(e) {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
@@ -56,7 +55,7 @@ function JoinPage() {
       localStorage.setItem(`csabaza:${res.sessionId}`, payload);
       localStorage.setItem(`csabaza:pin:${pin}`, payload);
       navigate({ to: "/play/$pin", params: { pin }, replace: true });
-    } catch (err: any) {
+    } catch (err) {
       toast.error(err?.message ?? "Could not join");
       setLoading(false);
     }
