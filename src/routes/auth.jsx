@@ -23,14 +23,13 @@ function AuthPage() {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Already-signed-in users skip the auth page
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) navigate({ to: "/dashboard", replace: true });
     });
   }, []);
 
-  async function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e) {
     e.preventDefault();
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -40,7 +39,7 @@ function AuthPage() {
     navigate({ to: "/dashboard", replace: true });
   }
 
-  async function handleSignup(e: React.FormEvent) {
+  async function handleSignup(e) {
     e.preventDefault();
     setLoading(true);
     const { error } = await supabase.auth.signUp({
