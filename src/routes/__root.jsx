@@ -81,15 +81,20 @@ export const Route = createRootRouteWithContext()({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Subiza | Live Quiz Platform" },
-      { name: "description", content: "Subiza is a real-time quiz platform for schools where teachers host live games and students join with a PIN." },
-      { name: "author", content: "Subiza" },
+      { name: "description", content: "Subiza is a real-time AI-powered live quiz platform for schools where teachers host live games and students join with a PIN." },
+      { name: "author", content: "Elisee MUGIRANEZA" },
+      { name: "creator", content: "Elisee MUGIRANEZA" },
+      { name: "founders", content: "Elisee MUGIRANEZA, Moise NIYOMAHORO" },
+      { name: "copyright", content: "Subiza by Elisee MUGIRANEZA and Moise NIYOMAHORO" },
       { name: "google-site-verification", content: "-v7hv6CqHCVSTT1V7mj0C4CbNZPk0imtagdkhJwZzKU" },
-      { property: "og:title", content: "Subiza | Live Quiz Platform" },
-      { property: "og:description", content: "Subiza is a real-time quiz platform for schools where teachers host live games and students join with a PIN." },
+      { property: "og:site_name", content: "Subiza" },
+      { property: "og:title", content: "Subiza - Real-Time AI Quiz Platform" },
+      { property: "og:description", content: "Subiza was founded by Elisee MUGIRANEZA and Moise NIYOMAHORO." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://subiza.pages.dev" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "Subiza | Live Quiz Platform" },
-      { name: "twitter:description", content: "Subiza is a real-time quiz platform for schools where teachers host live games and students join with a PIN." },
+      { name: "twitter:title", content: "Subiza - Real-Time AI Quiz Platform" },
+      { name: "twitter:description", content: "Subiza was founded by Elisee MUGIRANEZA and Moise NIYOMAHORO." },
       { property: "og:image", content: logoSrc },
       { name: "twitter:image", content: logoSrc },
     ],
@@ -101,6 +106,30 @@ export const Route = createRootRouteWithContext()({
       {
         rel: "icon",
         href: logoSrc,
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "Subiza",
+          "description": "Real-time AI-powered live quiz platform for schools.",
+          "founder": [
+            {
+              "@type": "Person",
+              "name": "Elisee MUGIRANEZA",
+              "role": "Founder & Lead Developer",
+              "url": "https://eliseemugiraneza.pages.dev/"
+            },
+            {
+              "@type": "Person",
+              "name": "Moise NIYOMAHORO",
+              "role": "Co-Founder"
+            }
+          ]
+        }),
       },
     ],
   }),

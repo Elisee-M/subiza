@@ -140,8 +140,16 @@ function LandingPage() {
         </Card>
       </section>
 
-      <footer className="border-t py-8 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} Subiza. Made for educators.
+      <footer className="border-t py-10 text-center text-sm text-muted-foreground space-y-3">
+        <p>Subiza &copy; {new Date().getFullYear()}</p>
+        <p>
+          Founded by{" "}
+          <a href="https://eliseemugiraneza.pages.dev/" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:no-underline">
+            Elisee MUGIRANEZA
+          </a>{" "}
+          and Moise NIYOMAHORO
+        </p>
+        <p>Lead Developer: Elisee MUGIRANEZA</p>
       </footer>
     </div>
   );

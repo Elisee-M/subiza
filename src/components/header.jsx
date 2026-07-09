@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { SubizaLogo } from "./subiza-logo";
 import { Button } from "./ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { LogOut, LayoutDashboard, Shield, Home, LogIn, Gamepad2, ShieldAlert } from "lucide-react";
+import { LogOut, LayoutDashboard, Shield, Home, LogIn, Gamepad2, ShieldAlert, Users } from "lucide-react";
 
 export function Header() {
   const { user, isAdmin, isSuperAdmin, signOut } = useAuth();
@@ -18,6 +18,14 @@ export function Header() {
               activeProps={{ className: "bg-accent text-accent-foreground" }}
             >
               <Home className="size-4" /> Home
+            </Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link
+              to="/founders"
+              activeProps={{ className: "bg-accent text-accent-foreground" }}
+            >
+              <Users className="size-4" /> Founders
             </Link>
           </Button>
           {user && (

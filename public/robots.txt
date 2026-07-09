@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://subiza.pages.dev/sitemap.xml
