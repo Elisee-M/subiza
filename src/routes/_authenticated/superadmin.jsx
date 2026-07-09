@@ -22,19 +22,17 @@ export const Route = createFileRoute("/_authenticated/superadmin")({
   component: SuperadminPage,
 });
 
-type Row = Awaited<ReturnType<typeof listAllUsers>>[number];
-
 function SuperadminPage() {
   const { user, roles, loading } = useAuth();
-  const isSuper = roles.includes("superadmin" as any);
+  const isSuper = roles.includes("superadmin");
   const list = useServerFn(listAllUsers);
   const setDisabled = useServerFn(setUserDisabled);
   const setRole = useServerFn(setUserRole);
   const del = useServerFn(deleteUser);
   const stats = useServerFn(platformStats);
 
-  const [rows, setRows] = useState<Row[]>([]);
-  const [platform, setPlatform] = useState<{ users: number; quizzes: number; sessions: number; participants: number } | null>(null);
+  const [rows, setRows] = useState([]);
+  const [platform, setPlatform] = useState(null);
   const [busy, setBusy] = useState(false);
 
   async function refresh() {
@@ -42,7 +40,7 @@ function SuperadminPage() {
       const [u, s] = await Promise.all([list(), stats()]);
       setRows(u);
       setPlatform(s);
-    } catch (e: any) {
+    } catch (e) {
       toast.error(e.message ?? "Failed to load");
     }
   }
@@ -66,34 +64,34 @@ function SuperadminPage() {
     );
   }
 
-  async function toggleDisabled(r: Row) {
+  async function toggleDisabled(r) {
     if (r.id === user?.id) return toast.error("You can't disable yourself.");
     setBusy(true);
     try {
       await setDisabled({ data: { userId: r.id, disabled: !r.disabled } });
       toast.success(!r.disabled ? "User disabled" : "User enabled");
       await refresh();
-    } catch (e: any) { toast.error(e.message); } finally { setBusy(false); }
+    } catch (e) { toast.error(e.message); } finally { setBusy(false); }
   }
 
-  async function toggleRole(r: Row, role: "teacher" | "admin" | "superadmin") {
+  async function toggleRole(r, role) {
     const has = r.roles.includes(role);
     setBusy(true);
     try {
       await setRole({ data: { userId: r.id, role, grant: !has } });
       toast.success(`${has ? "Removed" : "Granted"} ${role}`);
       await refresh();
-    } catch (e: any) { toast.error(e.message); } finally { setBusy(false); }
+    } catch (e) { toast.error(e.message); } finally { setBusy(false); }
   }
 
-  async function removeUser(r: Row) {
+  async function removeUser(r) {
     if (!confirm(`Permanently delete ${r.email}? This deletes their quizzes too.`)) return;
     setBusy(true);
     try {
       await del({ data: { userId: r.id } });
       toast.success("User deleted");
       await refresh();
-    } catch (e: any) { toast.error(e.message); } finally { setBusy(false); }
+    } catch (e) { toast.error(e.message); } finally { setBusy(false); }
   }
 
   return (
@@ -145,7 +143,7 @@ function SuperadminPage() {
                     </td>
                     <td className="p-3">
                       <div className="flex flex-wrap gap-1">
-                        {(["superadmin", "admin", "teacher"] as const).map((role) => {
+                        {(["superadmin", "admin", "teacher"]).map((role) => {
                           const has = r.roles.includes(role);
                           return (
                             <button
@@ -206,7 +204,7 @@ function SuperadminPage() {
   );
 }
 
-function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
+function StatCard({ icon, label, value }) {
   return (
     <Card className="glass p-4 border-2">
       <div className="flex items-center gap-2 text-muted-foreground">{icon}<span className="text-sm">{label}</span></div>
