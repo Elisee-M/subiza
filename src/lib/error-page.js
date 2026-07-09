@@ -1,4 +1,4 @@
-export function renderErrorPage(): string {
+export function renderErrorPage() {
   return `<!doctype html>
 <html lang="en">
   <head>
