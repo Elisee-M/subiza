@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [quizzes, setQuizzes] = useState<any[]>([]);
+  const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const startSession = useServerFn(createSession);
   const delQuiz = useServerFn(deleteQuiz);
@@ -36,15 +36,15 @@ function Dashboard() {
   }
   useEffect(() => { load(); }, [user?.id]);
 
-  async function host(quizId: string) {
+  async function host(quizId) {
     try {
       const s = await startSession({ data: { quizId } });
       navigate({ to: "/host/$sessionId", params: { sessionId: s.id } });
-    } catch (e: any) {
+    } catch (e) {
       toast.error(e?.message ?? "Could not start");
     }
   }
-  async function remove(id: string) {
+  async function remove(id) {
     if (!confirm("Delete this quiz?")) return;
     await delQuiz({ data: { id } });
     load();
