@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import logoAsset from "@/assets/csabaza-logo.png.asset.json";
 
-export function CSAbazaLogo({ className = "", showTagline = true }: { className?: string; showTagline?: boolean }) {
+export function CSAbazaLogo({ className = "", showTagline = true }) {
   return (
     <Link to="/" className={`inline-flex items-center gap-3 ${className}`}>
       <img
