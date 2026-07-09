@@ -14,7 +14,7 @@ const Input = z.object({
 
 export const generateAIQuiz = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => Input.parse(d))
+  .inputValidator((d) => Input.parse(d))
   .handler(async ({ data }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("AI service is not configured.");
@@ -74,8 +74,8 @@ Audience: school / educational. Cover the topic broadly and avoid duplicate ques
     if (!res.ok) throw new Error(`AI error (${res.status})`);
 
     const body = await res.json();
-    const text: string = body.choices?.[0]?.message?.content ?? "{}";
-    let parsed: { title?: string; description?: string; questions?: any[] };
+    const text = body.choices?.[0]?.message?.content ?? "{}";
+    let parsed;
     try {
       parsed = JSON.parse(text);
     } catch {
@@ -88,7 +88,7 @@ Audience: school / educational. Cover the topic broadly and avoid duplicate ques
       title: parsed.title ?? data.topic,
       description: parsed.description ?? `AI-generated quiz on ${data.topic}`,
       questions: (parsed.questions ?? [])
-        .map((q: any) => {
+        .map((q) => {
           const type = ["multiple_choice", "true_false", "fill_blank", "matching"].includes(q.type)
             ? q.type
             : "multiple_choice";
@@ -103,6 +103,6 @@ Audience: school / educational. Cover the topic broadly and avoid duplicate ques
             points: 100,
           };
         })
-        .filter((q: any) => allowedSet.has(q.type)),
+        .filter((q) => allowedSet.has(q.type)),
     };
   });
