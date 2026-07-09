@@ -15,12 +15,12 @@ export const Route = createFileRoute("/_authenticated/admin")({
 function AdminPage() {
   const { isAdmin, user, loading } = useAuth();
   const [stats, setStats] = useState({ users: 0, quizzes: 0, sessions: 0 });
-  const [recentQuizzes, setRecentQuizzes] = useState<any[]>([]);
-  const [recentUsers, setRecentUsers] = useState<any[]>([]);
-  const [sessionLogs, setSessionLogs] = useState<any[]>([]);
-  const [allParticipants, setAllParticipants] = useState<any[]>([]);
-  const [allResponses, setAllResponses] = useState<any[]>([]);
-  const [allQuestions, setAllQuestions] = useState<any[]>([]);
+  const [recentQuizzes, setRecentQuizzes] = useState([]);
+  const [recentUsers, setRecentUsers] = useState([]);
+  const [sessionLogs, setSessionLogs] = useState([]);
+  const [allParticipants, setAllParticipants] = useState([]);
+  const [allResponses, setAllResponses] = useState([]);
+  const [allQuestions, setAllQuestions] = useState([]);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -52,20 +52,19 @@ function AdminPage() {
     })();
   }, [isAdmin]);
 
-  // Per-quiz analytics: avg score % and accuracy across all sessions
   const quizAnalytics = useMemo(() => {
-    const byQuiz = new Map<string, { title: string; plays: number; scoreSum: number; scoreCount: number; correct: number; total: number; topWinner: { name: string; score: number } | null }>();
-    const quizMax = new Map<string, number>();
+    const byQuiz = new Map();
+    const quizMax = new Map();
     for (const q of allQuestions) {
       quizMax.set(q.quiz_id, (quizMax.get(q.quiz_id) ?? 0) + (q.points ?? 0));
     }
-    const sessionQuiz = new Map<string, string>();
+    const sessionQuiz = new Map();
     for (const s of sessionLogs) sessionQuiz.set(s.id, s.quiz_id);
     for (const s of sessionLogs) {
       const key = s.quiz_id;
       const existing = byQuiz.get(key) ?? { title: s.quizzes?.title ?? "—", plays: 0, scoreSum: 0, scoreCount: 0, correct: 0, total: 0, topWinner: null };
       existing.plays += 1;
-      const sessionParts = (s.participants ?? []) as any[];
+      const sessionParts = s.participants ?? [];
       for (const p of sessionParts) {
         const max = quizMax.get(key) ?? 0;
         if (max > 0) {
@@ -78,8 +77,7 @@ function AdminPage() {
       }
       byQuiz.set(key, existing);
     }
-    // question-level accuracy per quiz
-    const qToQuiz = new Map<string, string>();
+    const qToQuiz = new Map();
     for (const q of allQuestions) qToQuiz.set(q.id, q.quiz_id);
     for (const r of allResponses) {
       const qz = qToQuiz.get(r.question_id);
@@ -102,7 +100,7 @@ function AdminPage() {
   const bestQuizzes = [...quizAnalytics].filter((q) => q.plays > 0).sort((a, b) => b.avgPct - a.avgPct).slice(0, 5);
   const hardestQuizzes = [...quizAnalytics].filter((q) => q.plays > 0).sort((a, b) => a.accuracy - b.accuracy).slice(0, 5);
   const topPlayers = useMemo(() => {
-    const map = new Map<string, number>();
+    const map = new Map();
     for (const p of allParticipants) map.set(p.nickname, (map.get(p.nickname) ?? 0) + p.score);
     return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
   }, [allParticipants]);
@@ -234,7 +232,7 @@ function AdminPage() {
               </thead>
               <tbody>
                 {sessionLogs.map((s) => {
-                  const parts = (s.participants ?? []) as any[];
+                  const parts = s.participants ?? [];
                   const winner = parts.length ? [...parts].sort((a, b) => b.score - a.score)[0] : null;
                   return (
                     <tr key={s.id} className="border-t">
@@ -265,7 +263,7 @@ function AdminPage() {
   );
 }
 
-function StatCard({ icon: Icon, label, value }: { icon: any; label: string; value: number }) {
+function StatCard({ icon: Icon, label, value }) {
   return (
     <Card className="p-5 bg-gradient-card border-2">
       <Icon className="size-5 text-primary" />
