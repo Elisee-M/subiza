@@ -5,14 +5,12 @@ import { generatePin } from "./csabaza";
 
 export const createSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ quizId: z.string() }).parse(d))
+  .inputValidator((d) => z.object({ quizId: z.string() }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    // verify ownership / accessibility
     const { data: quiz } = await supabase.from("quizzes").select("id").eq("id", data.quizId).single();
     if (!quiz) throw new Error("Quiz not found");
 
-    // Generate unique pin
     let pin = generatePin();
     for (let i = 0; i < 5; i++) {
       const { data: existing } = await supabase.from("sessions").select("id").eq("pin_code", pin).maybeSingle();
@@ -31,7 +29,7 @@ export const createSession = createServerFn({ method: "POST" })
 
 export const advanceSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .inputValidator((d) =>
     z.object({
       sessionId: z.string(),
       action: z.enum(["start", "reveal", "next", "end"]),
@@ -51,16 +49,16 @@ export const advanceSession = createServerFn({ method: "POST" })
     const nowIso = new Date().toISOString();
     let update;
     if (data.action === "start") {
-      update = { status: "question" as const, current_question_index: 0, current_question_started_at: nowIso };
+      update = { status: "question", current_question_index: 0, current_question_started_at: nowIso };
     } else if (data.action === "reveal") {
-      update = { status: "reveal" as const };
+      update = { status: "reveal" };
     } else if (data.action === "next") {
       const nextIdx = s.current_question_index + 1;
       update = nextIdx >= total
-        ? { status: "ended" as const, ended_at: nowIso }
-        : { status: "question" as const, current_question_index: nextIdx, current_question_started_at: nowIso };
+        ? { status: "ended", ended_at: nowIso }
+        : { status: "question", current_question_index: nextIdx, current_question_started_at: nowIso };
     } else {
-      update = { status: "ended" as const, ended_at: nowIso };
+      update = { status: "ended", ended_at: nowIso };
     }
 
     const { error } = await supabase.from("sessions").update(update).eq("id", data.sessionId);
