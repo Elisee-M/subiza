@@ -1,23 +1,17 @@
 import { Crown, Medal, Sparkles, PartyPopper } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
-type Player = { id: string; nickname: string; score: number };
-
 export function WinnersPodium({
   participants,
   maxScore,
   highlightId,
-}: {
-  participants: Player[];
-  maxScore?: number;
-  highlightId?: string;
 }) {
   const sorted = [...participants].sort((a, b) => b.score - a.score);
   const winner = sorted[0];
   const podium = sorted.slice(0, 3);
   if (!winner) return null;
 
-  const pct = (s: number) =>
+  const pct = (s) =>
     maxScore && maxScore > 0 ? Math.round((s / maxScore) * 100) : null;
 
   return (
@@ -47,13 +41,13 @@ export function WinnersPodium({
         {[podium[1], podium[0], podium[2]].map((p, i) => {
           if (!p) return <div key={i} />;
           const place = p === podium[0] ? 1 : p === podium[1] ? 2 : 3;
-          const heights = { 1: "h-44", 2: "h-32", 3: "h-24" } as const;
+          const heights = { 1: "h-44", 2: "h-32", 3: "h-24" };
           const colors = {
             1: "bg-gradient-to-b from-yellow-300 via-warning to-warning/70",
             2: "bg-gradient-to-b from-slate-200 to-slate-400",
             3: "bg-gradient-to-b from-amber-500 to-amber-700",
-          } as const;
-          const label = { 1: "Gold", 2: "Silver", 3: "Bronze" } as const;
+          };
+          const label = { 1: "Gold", 2: "Silver", 3: "Bronze" };
           const Icon = place === 1 ? Crown : Medal;
           const isMe = highlightId && p.id === highlightId;
           const p100 = pct(p.score);
@@ -91,7 +85,7 @@ export function WinnersPodium({
   );
 }
 
-export function fireCelebration(confetti: any) {
+export function fireCelebration(confetti) {
   const duration = 3500;
   const end = Date.now() + duration;
   const colors = ["#7c3aed", "#f59e0b", "#ec4899", "#10b981", "#3b82f6"];
