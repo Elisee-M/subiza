@@ -7,20 +7,30 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+
+# Build output
 dist
 dist-ssr
 .output
 .vinxi
 .tanstack/**
 .nitro
+
+# Environment / secrets
 *.local
+.env
+
+# Lockfiles (use npm — package-lock.json)
+bun.lock
+bunfig.toml
 
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars
 
-# Editor directories and files
+# Editor
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -35,3 +45,13 @@ dist-ssr
 .firebase/
 functions/node_modules/
 y/
+
+# Lovable / agent scaffolding
+.agents/
+skills-lock.json
+
+# GitHub workflows
+.github/
+
+# Generated files (JS version tracked instead)
+src/routeTree.gen.ts
