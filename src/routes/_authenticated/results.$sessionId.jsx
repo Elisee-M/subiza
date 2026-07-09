@@ -14,10 +14,10 @@ export const Route = createFileRoute("/_authenticated/results/$sessionId")({
 
 function ResultsPage() {
   const { sessionId } = Route.useParams();
-  const [session, setSession] = useState<any>(null);
-  const [questions, setQuestions] = useState<any[]>([]);
-  const [participants, setParticipants] = useState<any[]>([]);
-  const [responses, setResponses] = useState<any[]>([]);
+  const [session, setSession] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [participants, setParticipants] = useState([]);
+  const [responses, setResponses] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -35,7 +35,7 @@ function ResultsPage() {
   }, [sessionId]);
 
   const maxScore = useMemo(() => questions.reduce((a, q) => a + (q.points ?? 0), 0), [questions]);
-  const toPct = (s: number) => (maxScore > 0 ? Math.round((s / maxScore) * 100) : s);
+  const toPct = (s) => (maxScore > 0 ? Math.round((s / maxScore) * 100) : s);
 
   const stats = useMemo(() => {
     if (participants.length === 0) return null;
@@ -58,10 +58,7 @@ function ResultsPage() {
 
   const sorted = [...participants].sort((a, b) => b.score - a.score);
   const mostMissed = [...perQuestion].filter((p) => p.count > 0).sort((a, b) => a.accuracy - b.accuracy).slice(0, 3);
-  const winner = sorted[0];
-  const podium = sorted.slice(0, 3);
 
-  // Fire confetti when the leaderboard loads
   useEffect(() => {
     if (participants.length === 0) return;
     const duration = 3500;
@@ -72,7 +69,6 @@ function ResultsPage() {
       confetti({ particleCount: 4, angle: 120, spread: 70, origin: { x: 1 }, colors });
       if (Date.now() < end) requestAnimationFrame(frame);
     })();
-    // Big burst at the winner
     setTimeout(() => {
       confetti({ particleCount: 180, spread: 100, origin: { y: 0.35 }, colors, scalar: 1.1 });
     }, 300);
@@ -162,7 +158,7 @@ function ResultsPage() {
   );
 }
 
-function Stat({ icon: Icon, label, value, accent, suffix }: { icon: any; label: string; value: number; accent?: boolean; suffix?: string }) {
+function Stat({ icon: Icon, label, value, accent, suffix }) {
   return (
     <Card className={`p-5 ${accent ? "bg-gradient-primary text-primary-foreground border-0" : ""}`}>
       <Icon className="size-5 opacity-80" />
