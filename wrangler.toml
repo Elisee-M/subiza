@@ -1,9 +1,1 @@
-name = "csabaza"
-pages_build_output_dir = "dist"
-compatibility_date = "2026-07-09"
-compatibility_flags = ["nodejs_compat"]
 
-[vars]
-SUPABASE_URL = "https://nrymkwqwxcyawsyhetcw.supabase.co"
-SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5yeW1rd3F3eGN5YXdzeWhldGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMjAxNjMsImV4cCI6MjA5NjU5NjE2M30.tVTuTRIZrKSd2d2y6aWkS_Z86jvVhFwr3GcucqsQPHs"
-SUPABASE_PROJECT_ID = "nrymkwqwxcyawsyhetcw"
